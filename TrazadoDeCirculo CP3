@@ -1,0 +1,94 @@
+#include <math.h>
+#include <GL/glut.h>
+#include <Windows.h>
+#include <iostream>
+
+using namespace std;
+
+void iniciar(void)
+{
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glMatrixMode(GL_PROJECTION);
+	gluOrtho2D(-40, 40, -40, 40);
+}
+
+void dibujarLinea()
+{
+	glColor3f(0.0, 0.0, 0);
+	glBegin(GL_LINES);
+	glVertex2f(40, 0);
+	glVertex2f(-40, 0);
+	glVertex2f(0, 40);
+	glVertex2f(0, -40);
+	glEnd();
+}
+
+//esta funcion es para dibujar cada pixel en la ventana pasandole los parametros int X int Y
+void pixel(GLint x, GLint y)
+{
+	glColor3f(0.0, 0.0, 0.0); //le colocamos un codigo de color en esta caso es el color negro
+	glPointSize(8); 
+	glBegin(GL_POINTS);
+	glVertex2f(x, y); //con esta funcion ubicamos dos coordenadas o ejes en este caso es eje x y y
+	glEnd(); //finalizamos la instruccion
+}
+
+void PuntoMedioCirculo(int r, int xr, int yr)
+{
+	int x = 0; //declaramos las variables
+	int y = r;
+	int pk = 5 / 4 - r;
+
+	//condicion que si x es menor o igual a y hace las demas condiciones
+	while (x <= y)
+	{
+		pixel(xr + x, yr + y);
+		pixel(xr - x, yr + y);	
+		pixel(xr + x, yr - y);
+		pixel(xr - x, yr - y);
+		pixel(yr + y, xr + x);
+		pixel(yr - y, xr + x);
+		pixel(yr + y, xr - x);
+		pixel(yr - y, xr - x);
+
+		if (pk <= 0)
+		{
+			pk += 2 * (x - 1) + 1;
+			x++;
+		}
+		else
+		{
+			pk += 2 * (x + 1) - 2 * (y - 1) + 1;
+			x++;
+			y--;
+		}
+
+	}
+}
+
+//esta funcion dibuja la figura en la ventana
+void dibujar(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	GLint r = 10;
+	GLint xr = 0;
+	GLint yr = 0;
+	PuntoMedioCirculo(r, xr, yr);
+	dibujarLinea(); //esta es la funcion que declaramos arriba para trazar el circulo
+	glFlush(); //con esta limpiamos el bufer o cache para no sobrecargar los datos
+}
+
+
+//en esta funcion llamamos todas las funciones creadas anteriormente
+int main(int argc, char* argv[])
+{
+	glutInit(&argc, argv); //inicializamos las librerias de opengl
+	glutInitWindowSize(700, 700); //inicializamos tamaño de la ventana de 700x700
+	glutInitWindowPosition(10, 10); //la posicion de ubicacion de la ventana
+	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+	glutCreateWindow("Trazado de circulo"); //el nombre que lleva la ventana
+	iniciar(); //llamamos la funcion Iniciar
+	glutDisplayFunc(dibujar); //aqui la funcion dibujar
+	glutMainLoop(); //esta es una funcion de opengl para crear un ciclo inteligente cada vez que queramos
+	return 0;
+}
